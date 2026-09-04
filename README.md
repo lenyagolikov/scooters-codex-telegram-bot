@@ -48,7 +48,7 @@ Codex CLI должен самостоятельно запускаться на 
 
 ```bash
 git clone https://github.com/lenyagolikov/scooters-codex-telegram-bot.git
-cd REPOSITORY
+cd scooters-codex-telegram-bot
 ```
 
 ### macOS и Linux
