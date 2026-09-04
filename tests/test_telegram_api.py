@@ -1,9 +1,14 @@
 from __future__ import annotations
 
 import unittest
-from unittest.mock import AsyncMock
+from http.client import RemoteDisconnected
+from unittest.mock import AsyncMock, Mock
 
-from scooters_codex_telegram_bot.telegram_api import TelegramApi, markdown_to_telegram_html
+from scooters_codex_telegram_bot.telegram_api import (
+    TelegramApi,
+    TelegramError,
+    markdown_to_telegram_html,
+)
 
 
 class MarkdownToTelegramHtmlTests(unittest.TestCase):
@@ -41,6 +46,15 @@ class MarkdownToTelegramHtmlTests(unittest.TestCase):
 
 
 class TelegramApiTests(unittest.IsolatedAsyncioTestCase):
+    def test_remote_disconnect_is_reported_as_retryable_telegram_error(self) -> None:
+        api = TelegramApi("not-a-real-token")
+        api._open = Mock(  # type: ignore[method-assign]
+            side_effect=RemoteDisconnected("peer closed connection")
+        )
+
+        with self.assertRaisesRegex(TelegramError, "network error"):
+            api._call_sync("getUpdates", {}, 45)
+
     async def test_formatted_message_uses_html_without_link_preview(self) -> None:
         api = TelegramApi("not-a-real-token")
         api.call = AsyncMock(return_value={"message_id": 42})  # type: ignore[method-assign]

@@ -5,10 +5,10 @@ import json
 import re
 import socket
 from html import escape
-from http.client import HTTPSConnection
+from http.client import HTTPException, HTTPSConnection
 from pathlib import Path
 from typing import Any
-from urllib.error import HTTPError, URLError
+from urllib.error import HTTPError
 from urllib.parse import urlparse
 from urllib.request import HTTPSHandler, Request, build_opener
 
@@ -122,10 +122,8 @@ class TelegramApi:
             raise TelegramError(
                 f"Telegram request {method} failed with HTTP {error.code}"
             ) from error
-        except URLError as error:
+        except (HTTPException, OSError) as error:
             raise TelegramError(f"Telegram request {method} failed: network error") from error
-        except TimeoutError as error:
-            raise TelegramError(f"Telegram request {method} timed out") from error
 
         if not body.get("ok"):
             description = body.get("description", "unknown Telegram error")
@@ -231,10 +229,8 @@ class TelegramApi:
             raise TelegramError(
                 f"Telegram file download failed with HTTP {error.code}"
             ) from error
-        except URLError as error:
+        except (HTTPException, OSError) as error:
             raise TelegramError("Telegram file download failed: network error") from error
-        except TimeoutError as error:
-            raise TelegramError("Telegram file download timed out") from error
 
 
 def split_message(text: str, limit: int = 3900) -> list[str]:
