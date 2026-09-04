@@ -1,0 +1,17 @@
+[Unit]
+Description=Scooters Codex Telegram Bot
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=__WORKING_DIRECTORY__
+ExecStart=__BOT_EXECUTABLE__ --config __CONFIG_FILE__
+Restart=always
+RestartSec=10
+KillMode=control-group
+TimeoutStopSec=15
+UMask=0077
+
+[Install]
+WantedBy=default.target
